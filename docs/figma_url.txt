@@ -1,0 +1,40 @@
+# Auth Domain
+
+## Landing Page
+Implement this design from Figma.
+@https://www.figma.com/design/rsNDmqYGaQqZDY3pMxo4Su/FinU-APB?node-id=130-1234&m=dev
+
+## Create Account
+Implement this design from Figma.
+@https://www.figma.com/design/rsNDmqYGaQqZDY3pMxo4Su/FinU-APB?node-id=130-1165&m=dev
+
+## Log In
+Implement this design from Figma.
+@https://www.figma.com/design/rsNDmqYGaQqZDY3pMxo4Su/FinU-APB?node-id=130-2410&m=dev
+
+## Forgot Password
+Implement this design from Figma.
+@https://www.figma.com/design/rsNDmqYGaQqZDY3pMxo4Su/FinU-APB?node-id=130-2534&m=dev
+
+## OTP
+Implement this design from Figma.
+@https://www.figma.com/design/rsNDmqYGaQqZDY3pMxo4Su/FinU-APB?node-id=130-2560&m=dev
+
+## Change Password
+Implement this design from Figma.
+@https://www.figma.com/design/rsNDmqYGaQqZDY3pMxo4Su/FinU-APB?node-id=130-2461&m=dev
+
+## Success Change Password
+Implement this design from Figma.
+@https://www.figma.com/design/rsNDmqYGaQqZDY3pMxo4Su/FinU-APB?node-id=130-2513&m=dev
+
+
+# Dashboard Domain
+
+## Dashboard
+Implement this design from Figma.
+@https://www.figma.com/design/rsNDmqYGaQqZDY3pMxo4Su/FinU-APB?node-id=130-1258&m=dev
+
+## Profile (Setting)
+Implement this design from Figma.
+@https://www.figma.com/design/rsNDmqYGaQqZDY3pMxo4Su/FinU-APB?node-id=130-1988&m=dev

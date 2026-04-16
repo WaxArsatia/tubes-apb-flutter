@@ -14,6 +14,7 @@ class AuthSessionController extends Notifier<AuthSessionState> {
   late final AuthRepository _authRepository;
   late final TokenStorage _tokenStorage;
   late final AccessTokenStore _accessTokenStore;
+  Future<bool>? _refreshFuture;
 
   @override
   AuthSessionState build() {
@@ -36,8 +37,13 @@ class AuthSessionController extends Notifier<AuthSessionState> {
     try {
       final tokenBundle = await _authRepository.refreshToken(refreshToken);
       await _applyTokenBundle(tokenBundle, fetchProfile: true);
-    } catch (_) {
-      await _setUnauthenticated(clearRefreshToken: true);
+    } catch (error) {
+      final clearRefreshToken = _shouldClearRefreshToken(error);
+      await _setUnauthenticated(clearRefreshToken: clearRefreshToken);
+
+      if (!clearRefreshToken) {
+        rethrow;
+      }
     }
   }
 
@@ -49,7 +55,15 @@ class AuthSessionController extends Notifier<AuthSessionState> {
     await _applyTokenBundle(tokenBundle, fetchProfile: true);
   }
 
-  Future<bool> refreshAccessToken() async {
+  Future<bool> refreshAccessToken() {
+    return _runSharedRefresh();
+  }
+
+  Future<void> markUnauthenticated({bool clearRefreshToken = false}) {
+    return _setUnauthenticated(clearRefreshToken: clearRefreshToken);
+  }
+
+  Future<bool> _doRefresh() async {
     final refreshToken = await _tokenStorage.readRefreshToken();
     if (refreshToken == null || refreshToken.isEmpty) {
       await _setUnauthenticated(clearRefreshToken: true);
@@ -67,10 +81,32 @@ class AuthSessionController extends Notifier<AuthSessionState> {
       );
 
       return true;
-    } catch (_) {
-      await _setUnauthenticated(clearRefreshToken: true);
+    } catch (error) {
+      final clearRefreshToken = _shouldClearRefreshToken(error);
+      await _setUnauthenticated(clearRefreshToken: clearRefreshToken);
+
+      if (!clearRefreshToken) {
+        rethrow;
+      }
+
       return false;
     }
+  }
+
+  Future<bool> _runSharedRefresh() {
+    final inFlightRefresh = _refreshFuture;
+    if (inFlightRefresh != null) {
+      return inFlightRefresh;
+    }
+
+    final refreshFuture = _doRefresh();
+    _refreshFuture = refreshFuture;
+
+    return refreshFuture.whenComplete(() {
+      if (identical(_refreshFuture, refreshFuture)) {
+        _refreshFuture = null;
+      }
+    });
   }
 
   Future<T> withRefreshRetry<T>(Future<T> Function() action) async {
@@ -81,12 +117,12 @@ class AuthSessionController extends Notifier<AuthSessionState> {
         rethrow;
       }
 
-      final refreshed = await refreshAccessToken();
+      final refreshed = await _runSharedRefresh();
       if (!refreshed) {
         rethrow;
       }
 
-      return action();
+      return await action();
     }
   }
 
@@ -117,19 +153,49 @@ class AuthSessionController extends Notifier<AuthSessionState> {
     _accessTokenStore.setAccessToken(tokenBundle.accessToken);
     await _tokenStorage.writeRefreshToken(tokenBundle.refreshToken);
 
-    AuthMeData? profile;
-    if (fetchProfile) {
-      try {
-        profile = await _authRepository.me();
-      } on ApiException {
-        profile = null;
+    if (!fetchProfile) {
+      final currentUser = state.user;
+      if (currentUser == null) {
+        throw StateError('Cannot authenticate session without a user profile.');
       }
+
+      state = AuthSessionState.authenticated(
+        user: currentUser,
+        accessToken: tokenBundle.accessToken,
+      );
+      return;
     }
 
-    state = AuthSessionState.authenticated(
-      user: profile,
-      accessToken: tokenBundle.accessToken,
-    );
+    try {
+      final profile = await _authRepository.me();
+
+      state = AuthSessionState.authenticated(
+        user: profile,
+        accessToken: tokenBundle.accessToken,
+      );
+    } on ApiException catch (error) {
+      if (error.statusCode == 401) {
+        await _setUnauthenticated(clearRefreshToken: true);
+      }
+
+      rethrow;
+    }
+  }
+
+  bool _shouldClearRefreshToken(Object error) {
+    if (error is! ApiException) {
+      return false;
+    }
+
+    final statusCode = error.statusCode;
+    if (statusCode == 400 || statusCode == 401) {
+      return true;
+    }
+
+    final message = error.message.toLowerCase();
+    return message.contains('invalid_grant') ||
+        message.contains('invalid refresh token') ||
+        (message.contains('refresh token') && message.contains('expired'));
   }
 
   Future<void> _setUnauthenticated({bool clearRefreshToken = false}) async {

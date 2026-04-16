@@ -68,6 +68,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           }
         }
 
+        if (!mounted) {
+          return;
+        }
+
         setState(() {
           _fieldErrors = mappedErrors;
         });

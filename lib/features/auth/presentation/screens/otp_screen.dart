@@ -206,7 +206,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
               ),
               const SizedBox(height: 14),
               Text(
-                'Code expired in: $_formattedRemaining',
+                'Code expires in: $_formattedRemaining',
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
               const SizedBox(height: 4),

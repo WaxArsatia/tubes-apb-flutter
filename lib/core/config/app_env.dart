@@ -20,16 +20,23 @@ final class AppEnv {
   }
 
   static String _resolveBaseUrl() {
-    const overridden = String.fromEnvironment('API_BASE_URL');
-    if (overridden.isNotEmpty) {
-      return overridden;
-    }
-
     return switch (environment) {
       AppEnvironment.dev => _resolveDevBaseUrl(),
-      AppEnvironment.staging => 'https://staging.example.com',
-      AppEnvironment.prod => 'https://api.example.com',
+      AppEnvironment.staging => _resolveEnvBaseUrl(AppEnvironment.staging),
+      AppEnvironment.prod => _resolveEnvBaseUrl(AppEnvironment.prod),
     };
+  }
+
+  static String _resolveEnvBaseUrl(AppEnvironment environment) {
+    const configuredBaseUrl = String.fromEnvironment('API_BASE_URL');
+    if (configuredBaseUrl.isNotEmpty) {
+      return configuredBaseUrl;
+    }
+
+    throw StateError(
+      'Missing API_BASE_URL for ${environment.name}. '
+      'Set --dart-define=API_BASE_URL=<your_api_base_url>.',
+    );
   }
 
   static String _resolveDevBaseUrl() {

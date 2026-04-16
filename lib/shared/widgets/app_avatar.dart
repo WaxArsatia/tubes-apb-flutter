@@ -15,12 +15,13 @@ class AppAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final hasNetworkImage = imageUrl != null && imageUrl!.isNotEmpty;
+    final finalImageUrl = imageUrl?.trim();
+    final hasNetworkImage = finalImageUrl != null && finalImageUrl.isNotEmpty;
 
     return CircleAvatar(
       radius: radius,
       backgroundColor: AppColors.secondary,
-      backgroundImage: hasNetworkImage ? NetworkImage(imageUrl!) : null,
+      backgroundImage: hasNetworkImage ? NetworkImage(finalImageUrl) : null,
       child: hasNetworkImage
           ? null
           : Icon(fallbackIcon, color: AppColors.primary, size: radius),

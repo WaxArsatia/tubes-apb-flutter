@@ -165,4 +165,4 @@ flutter test
 7. Verify dashboard data rendering from backend.
 8. Update profile with valid and invalid image files (type/size checks).
 9. Toggle local preferences and verify persistence after restart.
-10. Logout and confirm private routes redirect to auth flow.
+10. Log out and confirm private routes redirect to auth flow.
