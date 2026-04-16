@@ -40,6 +40,11 @@ final class AppEnv {
   }
 
   static String _resolveDevBaseUrl() {
+    const configuredBaseUrl = String.fromEnvironment('API_BASE_URL');
+    if (configuredBaseUrl.isNotEmpty) {
+      return configuredBaseUrl;
+    }
+
     if (kIsWeb) {
       return 'http://localhost:3000';
     }

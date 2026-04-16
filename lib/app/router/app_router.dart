@@ -92,9 +92,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: RoutePaths.otp,
         redirect: (context, state) {
           final email = state.uri.queryParameters['email']?.trim();
-          final expiresInMinutes = int.tryParse(
-            state.uri.queryParameters['expires'] ?? '30',
-          );
+          final expiresParam = state.uri.queryParameters['expires']?.trim();
+          final expiresInMinutes = int.tryParse(expiresParam ?? '30');
 
           if (email == null || email.isEmpty) {
             return RoutePaths.forgotPassword;
@@ -107,9 +106,9 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           return null;
         },
         builder: (context, state) {
-          final email = state.uri.queryParameters['email']!;
-          final expiresInMinutes =
-              int.tryParse(state.uri.queryParameters['expires'] ?? '30') ?? 30;
+          final email = state.uri.queryParameters['email']!.trim();
+          final expiresParam = state.uri.queryParameters['expires']?.trim();
+          final expiresInMinutes = int.tryParse(expiresParam ?? '30') ?? 30;
 
           return OtpScreen(email: email, expiresInMinutes: expiresInMinutes);
         },
@@ -127,8 +126,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           return null;
         },
         builder: (context, state) {
-          final email = state.uri.queryParameters['email']!;
-          final otp = state.uri.queryParameters['otp']!;
+          final email = state.uri.queryParameters['email']!.trim();
+          final otp = state.uri.queryParameters['otp']!.trim();
 
           return ChangePasswordScreen(email: email, otp: otp);
         },

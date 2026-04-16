@@ -150,14 +150,14 @@ class AuthSessionController extends Notifier<AuthSessionState> {
     TokenBundle tokenBundle, {
     required bool fetchProfile,
   }) async {
-    _accessTokenStore.setAccessToken(tokenBundle.accessToken);
-    await _tokenStorage.writeRefreshToken(tokenBundle.refreshToken);
-
     if (!fetchProfile) {
       final currentUser = state.user;
       if (currentUser == null) {
         throw StateError('Cannot authenticate session without a user profile.');
       }
+
+      _accessTokenStore.setAccessToken(tokenBundle.accessToken);
+      await _tokenStorage.writeRefreshToken(tokenBundle.refreshToken);
 
       state = AuthSessionState.authenticated(
         user: currentUser,
@@ -166,18 +166,27 @@ class AuthSessionController extends Notifier<AuthSessionState> {
       return;
     }
 
+    _accessTokenStore.setAccessToken(tokenBundle.accessToken);
+
     try {
       final profile = await _authRepository.me();
+
+      await _tokenStorage.writeRefreshToken(tokenBundle.refreshToken);
 
       state = AuthSessionState.authenticated(
         user: profile,
         accessToken: tokenBundle.accessToken,
       );
     } on ApiException catch (error) {
+      _accessTokenStore.clear();
+
       if (error.statusCode == 401) {
         await _setUnauthenticated(clearRefreshToken: true);
       }
 
+      rethrow;
+    } catch (_) {
+      _accessTokenStore.clear();
       rethrow;
     }
   }
