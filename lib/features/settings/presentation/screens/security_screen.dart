@@ -76,6 +76,10 @@ class _SecurityScreenState extends ConsumerState<SecurityScreen> {
           }
         }
 
+        if (!mounted) {
+          return;
+        }
+
         setState(() {
           _fieldErrors = mappedErrors;
         });

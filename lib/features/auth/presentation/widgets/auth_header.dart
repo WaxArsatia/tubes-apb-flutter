@@ -8,6 +8,8 @@ class AuthHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final trimmedSubtitle = subtitle?.trim();
+
     return Column(
       children: [
         Text(
@@ -15,10 +17,10 @@ class AuthHeader extends StatelessWidget {
           style: Theme.of(context).textTheme.headlineMedium,
           textAlign: TextAlign.center,
         ),
-        if (subtitle != null) ...[
+        if (trimmedSubtitle != null && trimmedSubtitle.isNotEmpty) ...[
           const SizedBox(height: 8),
           Text(
-            subtitle!,
+            trimmedSubtitle,
             style: Theme.of(context).textTheme.bodyMedium,
             textAlign: TextAlign.center,
           ),

@@ -13,6 +13,10 @@ class ApiException implements Exception {
 
   @override
   String toString() {
-    return 'ApiException(statusCode: $statusCode, message: $message, fieldErrors: $fieldErrors)';
+    final fieldErrorsSummary = hasFieldErrors
+        ? '<redacted_field_errors: ${fieldErrors.length} fields>'
+        : '<none>';
+
+    return 'ApiException(statusCode: $statusCode, message: $message, fieldErrors: $fieldErrorsSummary)';
   }
 }

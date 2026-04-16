@@ -23,7 +23,7 @@ This plan delivers all referenced Figma screens with full API integration, stric
 15. Success CTA goes to Dashboard only if authenticated; otherwise returns to public flow.
 16. Wire settings security password change to authenticated PATCH endpoint.
 17. Phase 2: Dashboard milestone.
-18. Implement dashboard typed models/repository and map balance, budget remaining, income/expense, and recent transactions.
+18. Implement typed dashboard models/repository and map balance, budget remaining, income/expense, and recent transactions.
 19. Implement Dashboard UI with high fidelity, including greeting/avatar, summary cards, transactions preview, and See all action.
 20. Implement bottom navigation behavior:
 21. Home active.

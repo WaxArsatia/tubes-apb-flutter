@@ -223,6 +223,7 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
   @override
   Widget build(BuildContext context) {
     final user = ref.watch(authSessionControllerProvider).user;
+    final profilePicture = user?.profilePicture;
 
     ImageProvider<Object>? preview;
     if (_selectedImage != null) {
@@ -231,9 +232,8 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
       } else {
         preview = FileImage(File(_selectedImage!.path));
       }
-    } else if (user?.profilePicture != null &&
-        user!.profilePicture!.isNotEmpty) {
-      preview = NetworkImage(user.profilePicture!);
+    } else if (profilePicture?.isNotEmpty == true) {
+      preview = NetworkImage(profilePicture!);
     }
 
     return Scaffold(

@@ -19,7 +19,7 @@ class AppPrimaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final child = SizedBox(
+    return SizedBox(
       height: height,
       width: double.infinity,
       child: outlined
@@ -53,8 +53,6 @@ class AppPrimaryButton extends StatelessWidget {
               ),
             ),
     );
-
-    return child;
   }
 }
 

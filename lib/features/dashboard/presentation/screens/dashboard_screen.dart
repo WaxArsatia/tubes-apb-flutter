@@ -33,36 +33,41 @@ class DashboardScreen extends ConsumerWidget {
         child: dashboardState.when(
           data: (dashboard) => _DashboardBody(dashboard: dashboard),
           loading: () => const Center(child: CircularProgressIndicator()),
-          error: (error, stackTrace) => ListView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            children: [
-              const SizedBox(height: 120),
-              Icon(
-                Icons.wifi_tethering_error_rounded,
-                size: 42,
-                color: Theme.of(context).colorScheme.error,
-              ),
-              const SizedBox(height: 12),
-              Text(
-                'Failed to load dashboard',
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                error.toString(),
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-              const SizedBox(height: 16),
-              Center(
-                child: FilledButton(
-                  onPressed: () => ref.invalidate(dashboardDataProvider),
-                  child: const Text('Try Again'),
+          error: (error, stackTrace) {
+            debugPrint('Dashboard load error: $error');
+            debugPrintStack(stackTrace: stackTrace);
+
+            return ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              children: [
+                const SizedBox(height: 120),
+                Icon(
+                  Icons.wifi_tethering_error_rounded,
+                  size: 42,
+                  color: Theme.of(context).colorScheme.error,
                 ),
-              ),
-            ],
-          ),
+                const SizedBox(height: 12),
+                Text(
+                  'Failed to load dashboard',
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'An error occurred while loading the dashboard.',
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                const SizedBox(height: 16),
+                Center(
+                  child: FilledButton(
+                    onPressed: () => ref.invalidate(dashboardDataProvider),
+                    child: const Text('Try Again'),
+                  ),
+                ),
+              ],
+            );
+          },
         ),
       ),
     );

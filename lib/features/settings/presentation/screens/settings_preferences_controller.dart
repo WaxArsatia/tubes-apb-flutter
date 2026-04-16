@@ -43,26 +43,34 @@ class SettingsPreferencesController
   }
 
   Future<void> updateCurrency(String currency) async {
-    final current = state.value;
-    if (current == null) {
+    if (state.value == null) {
       return;
     }
 
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_currencyKey, currency);
 
-    state = AsyncData(current.copyWith(currency: currency));
+    final latest = state.value;
+    if (latest == null) {
+      return;
+    }
+
+    state = AsyncData(latest.copyWith(currency: currency));
   }
 
   Future<void> updateNotification(bool enabled) async {
-    final current = state.value;
-    if (current == null) {
+    if (state.value == null) {
       return;
     }
 
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_notificationKey, enabled);
 
-    state = AsyncData(current.copyWith(notificationsEnabled: enabled));
+    final latest = state.value;
+    if (latest == null) {
+      return;
+    }
+
+    state = AsyncData(latest.copyWith(notificationsEnabled: enabled));
   }
 }

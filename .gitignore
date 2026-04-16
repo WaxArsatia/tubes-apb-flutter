@@ -44,4 +44,7 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
-docs/
+docs/_build/
+docs/build/
+docs/**/*.html
+docs/**/*.pdf

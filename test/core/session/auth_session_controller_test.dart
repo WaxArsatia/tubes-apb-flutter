@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:tubes_apb_flutter/core/session/auth_session_controller.dart';
 import 'package:tubes_apb_flutter/core/session/auth_session_state.dart';
 import 'package:tubes_apb_flutter/core/session/token_storage.dart';
@@ -109,7 +110,7 @@ class _FakeAuthRepository extends AuthRepository {
             email: 'default@mail.com',
             profilePicture: null,
           ),
-      super(Dio());
+      super(_MockDio());
 
   final TokenBundle _refreshResponse;
   final AuthMeData _meResponse;
@@ -121,3 +122,5 @@ class _FakeAuthRepository extends AuthRepository {
   @override
   Future<AuthMeData> me() async => _meResponse;
 }
+
+class _MockDio extends Mock implements Dio {}

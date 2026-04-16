@@ -20,6 +20,14 @@ class DashboardRepository {
       return DashboardSuccess.fromJson(_asMap(response.data)).data;
     } on DioException catch (error) {
       throw parseDioException(error);
+    } on ApiException {
+      rethrow;
+    } on TypeError {
+      throw const ApiException(message: 'Invalid dashboard response payload.');
+    } on FormatException {
+      throw const ApiException(message: 'Invalid dashboard response payload.');
+    } on Exception {
+      throw const ApiException(message: 'Invalid dashboard response payload.');
     }
   }
 

@@ -90,27 +90,45 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: RoutePaths.otp,
-        builder: (context, state) {
-          final email = state.uri.queryParameters['email'];
-          final expiresInMinutes =
-              int.tryParse(state.uri.queryParameters['expires'] ?? '30') ?? 30;
+        redirect: (context, state) {
+          final email = state.uri.queryParameters['email']?.trim();
+          final expiresInMinutes = int.tryParse(
+            state.uri.queryParameters['expires'] ?? '30',
+          );
 
           if (email == null || email.isEmpty) {
-            return const ForgotPasswordScreen();
+            return RoutePaths.forgotPassword;
           }
+
+          if (expiresInMinutes == null || expiresInMinutes <= 0) {
+            return RoutePaths.forgotPassword;
+          }
+
+          return null;
+        },
+        builder: (context, state) {
+          final email = state.uri.queryParameters['email']!;
+          final expiresInMinutes =
+              int.tryParse(state.uri.queryParameters['expires'] ?? '30') ?? 30;
 
           return OtpScreen(email: email, expiresInMinutes: expiresInMinutes);
         },
       ),
       GoRoute(
         path: RoutePaths.changePassword,
-        builder: (context, state) {
-          final email = state.uri.queryParameters['email'];
-          final otp = state.uri.queryParameters['otp'];
+        redirect: (context, state) {
+          final email = state.uri.queryParameters['email']?.trim();
+          final otp = state.uri.queryParameters['otp']?.trim();
 
           if (email == null || email.isEmpty || otp == null || otp.isEmpty) {
-            return const ForgotPasswordScreen();
+            return RoutePaths.forgotPassword;
           }
+
+          return null;
+        },
+        builder: (context, state) {
+          final email = state.uri.queryParameters['email']!;
+          final otp = state.uri.queryParameters['otp']!;
 
           return ChangePasswordScreen(email: email, otp: otp);
         },

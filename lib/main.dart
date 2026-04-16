@@ -7,7 +7,35 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   final container = ProviderContainer();
-  await container.read(authSessionControllerProvider.notifier).restoreSession();
+  final sessionController = container.read(
+    authSessionControllerProvider.notifier,
+  );
+
+  try {
+    await sessionController.restoreSession();
+  } catch (error, stackTrace) {
+    FlutterError.reportError(
+      FlutterErrorDetails(
+        exception: error,
+        stack: stackTrace,
+        library: 'app_startup',
+        context: ErrorDescription('while restoring auth session'),
+      ),
+    );
+
+    try {
+      await sessionController.markUnauthenticated(clearRefreshToken: false);
+    } catch (fallbackError, fallbackStackTrace) {
+      FlutterError.reportError(
+        FlutterErrorDetails(
+          exception: fallbackError,
+          stack: fallbackStackTrace,
+          library: 'app_startup',
+          context: ErrorDescription('while applying unauthenticated fallback'),
+        ),
+      );
+    }
+  }
 
   runApp(UncontrolledProviderScope(container: container, child: const App()));
 }

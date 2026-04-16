@@ -215,8 +215,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       'Already have an account? ',
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
-                    GestureDetector(
-                      onTap: () => context.go(RoutePaths.login),
+                    TextButton(
+                      onPressed: () => context.go(RoutePaths.login),
                       child: Text(
                         'Login',
                         style: Theme.of(context).textTheme.bodyLarge?.copyWith(

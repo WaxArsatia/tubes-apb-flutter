@@ -139,8 +139,8 @@ class SettingsScreen extends ConsumerWidget {
                       subtitle: 'Receive reminder and updates',
                       trailing: Switch(
                         value: preferences.notificationsEnabled,
-                        onChanged: (enabled) {
-                          ref
+                        onChanged: (enabled) async {
+                          await ref
                               .read(settingsPreferencesProvider.notifier)
                               .updateNotification(enabled);
                         },

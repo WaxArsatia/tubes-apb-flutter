@@ -1,0 +1,729 @@
+{
+  "openapi": "3.1.0",
+  "info": { "title": "tubes-apb-be API", "version": "1.0.0" },
+  "servers": [{ "url": "http://localhost:3000" }],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "AuthRegisterSuccess": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean", "enum": [true] },
+          "message": { "type": "string" },
+          "data": { "$ref": "#/components/schemas/AuthRegisterData" }
+        },
+        "required": ["success", "message", "data"]
+      },
+      "AuthRegisterData": {
+        "type": "object",
+        "properties": { "registered": { "type": "boolean", "enum": [true] } },
+        "required": ["registered"]
+      },
+      "ErrorEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean", "enum": [false] },
+          "message": { "type": "string" },
+          "errors": { "$ref": "#/components/schemas/ErrorFields" }
+        },
+        "required": ["success", "message"]
+      },
+      "ErrorFields": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "AuthLoginSuccess": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean", "enum": [true] },
+          "message": { "type": "string" },
+          "data": { "$ref": "#/components/schemas/TokenBundle" }
+        },
+        "required": ["success", "message", "data"]
+      },
+      "TokenBundle": {
+        "type": "object",
+        "properties": {
+          "accessToken": { "type": "string" },
+          "refreshToken": { "type": "string" },
+          "tokenType": { "type": "string", "enum": ["Bearer"] },
+          "expiresIn": { "type": "integer" }
+        },
+        "required": ["accessToken", "refreshToken", "tokenType", "expiresIn"]
+      },
+      "AuthLogoutSuccess": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean", "enum": [true] },
+          "message": { "type": "string" },
+          "data": { "$ref": "#/components/schemas/AuthLogoutData" }
+        },
+        "required": ["success", "message", "data"]
+      },
+      "AuthLogoutData": {
+        "type": "object",
+        "properties": { "loggedOut": { "type": "boolean", "enum": [true] } },
+        "required": ["loggedOut"]
+      },
+      "AuthMeSuccess": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean", "enum": [true] },
+          "message": { "type": "string" },
+          "data": { "$ref": "#/components/schemas/AuthMeData" }
+        },
+        "required": ["success", "message", "data"]
+      },
+      "AuthMeData": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "firstName": { "type": "string" },
+          "lastName": { "type": "string" },
+          "email": { "type": "string", "format": "email" },
+          "profilePicture": { "type": "string", "nullable": true }
+        },
+        "required": ["id", "firstName", "lastName", "email", "profilePicture"]
+      },
+      "ForgotPasswordSuccess": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean", "enum": [true] },
+          "message": { "type": "string" },
+          "data": { "$ref": "#/components/schemas/ForgotPasswordData" }
+        },
+        "required": ["success", "message", "data"]
+      },
+      "ForgotPasswordData": {
+        "type": "object",
+        "properties": {
+          "email": { "type": "string", "format": "email" },
+          "otpExpiresInMinutes": { "type": "integer", "example": 30 }
+        },
+        "required": ["email", "otpExpiresInMinutes"]
+      },
+      "VerifyOtpSuccess": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean", "enum": [true] },
+          "message": { "type": "string" },
+          "data": { "$ref": "#/components/schemas/VerifyOtpData" }
+        },
+        "required": ["success", "message", "data"]
+      },
+      "VerifyOtpData": {
+        "type": "object",
+        "properties": {
+          "email": { "type": "string", "format": "email" },
+          "otpVerified": { "type": "boolean", "enum": [true] }
+        },
+        "required": ["email", "otpVerified"]
+      },
+      "ChangePasswordSuccess": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean", "enum": [true] },
+          "message": { "type": "string" },
+          "data": { "$ref": "#/components/schemas/ChangePasswordData" }
+        },
+        "required": ["success", "message", "data"]
+      },
+      "ChangePasswordData": {
+        "type": "object",
+        "properties": {
+          "passwordChanged": { "type": "boolean", "enum": [true] }
+        },
+        "required": ["passwordChanged"]
+      },
+      "DashboardSuccess": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean", "enum": [true] },
+          "message": { "type": "string" },
+          "data": { "$ref": "#/components/schemas/DashboardData" }
+        },
+        "required": ["success", "message", "data"]
+      },
+      "DashboardData": {
+        "type": "object",
+        "properties": {
+          "firstName": { "type": "string" },
+          "profilePicture": { "type": "string", "nullable": true },
+          "totalBalance": { "type": "integer" },
+          "budgetRemaining": { "type": "integer" },
+          "income": { "type": "integer" },
+          "expense": { "type": "integer" },
+          "recentTransactions": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/RecentTransaction" }
+          }
+        },
+        "required": [
+          "firstName",
+          "profilePicture",
+          "totalBalance",
+          "budgetRemaining",
+          "income",
+          "expense",
+          "recentTransactions"
+        ]
+      },
+      "RecentTransaction": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "timestamp": { "type": "string", "format": "date-time" },
+          "kind": { "type": "string", "enum": ["Income", "Expense"] },
+          "amount": { "type": "integer" }
+        },
+        "required": ["name", "timestamp", "kind", "amount"]
+      },
+      "SettingsUpdateProfileSuccess": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean", "enum": [true] },
+          "message": { "type": "string" },
+          "data": { "$ref": "#/components/schemas/SettingsUpdateProfileData" }
+        },
+        "required": ["success", "message", "data"]
+      },
+      "SettingsUpdateProfileData": {
+        "type": "object",
+        "properties": {
+          "updated": { "type": "boolean", "enum": [true] },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        },
+        "required": ["updated", "updatedAt"]
+      }
+    },
+    "parameters": {}
+  },
+  "paths": {
+    "/": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Health check",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "enum": [true] },
+                    "message": { "type": "string" },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "healthy": { "type": "boolean", "enum": [true] }
+                      },
+                      "required": ["healthy"]
+                    }
+                  },
+                  "required": ["success", "message", "data"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/register": {
+      "post": {
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "firstName": { "type": "string", "minLength": 1 },
+                  "lastName": { "type": "string", "minLength": 1 },
+                  "email": { "type": "string", "format": "email" },
+                  "password": { "type": "string", "minLength": 8 },
+                  "confirmationPassword": { "type": "string", "minLength": 8 }
+                },
+                "required": [
+                  "firstName",
+                  "lastName",
+                  "email",
+                  "password",
+                  "confirmationPassword"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User registered",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AuthRegisterSuccess" }
+              }
+            }
+          },
+          "409": {
+            "description": "Email conflict",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorEnvelope" }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorEnvelope" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string", "format": "email" },
+                  "password": { "type": "string", "minLength": 1 }
+                },
+                "required": ["email", "password"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AuthLoginSuccess" }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorEnvelope" }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorEnvelope" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/refresh-token": {
+      "post": {
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "refreshToken": { "type": "string", "minLength": 1 }
+                },
+                "required": ["refreshToken"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Token refreshed",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AuthLoginSuccess" }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid refresh token",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorEnvelope" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "refreshToken": { "type": "string", "minLength": 1 }
+                },
+                "required": ["refreshToken"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Logout successful",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AuthLogoutSuccess" }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid refresh token",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorEnvelope" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/me": {
+      "get": {
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Current user profile",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AuthMeSuccess" }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorEnvelope" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/forgot-password": {
+      "post": {
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string", "format": "email" }
+                },
+                "required": ["email"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OTP sent",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForgotPasswordSuccess"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Email not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorEnvelope" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/verify-otp": {
+      "post": {
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string", "format": "email" },
+                  "otp": { "type": "integer", "minimum": 1000, "maximum": 9999 }
+                },
+                "required": ["email", "otp"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OTP verified",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/VerifyOtpSuccess" }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid OTP",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorEnvelope" }
+              }
+            }
+          },
+          "404": {
+            "description": "Email not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorEnvelope" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/change-password": {
+      "post": {
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string", "format": "email" },
+                  "otp": {
+                    "type": "integer",
+                    "minimum": 1000,
+                    "maximum": 9999
+                  },
+                  "newPassword": { "type": "string", "minLength": 8 },
+                  "confirmationPassword": { "type": "string", "minLength": 8 }
+                },
+                "required": [
+                  "email",
+                  "otp",
+                  "newPassword",
+                  "confirmationPassword"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password changed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChangePasswordSuccess"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "OTP invalid",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorEnvelope" }
+              }
+            }
+          },
+          "404": {
+            "description": "Email not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorEnvelope" }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorEnvelope" }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "oldPassword": { "type": "string", "minLength": 1 },
+                  "newPassword": { "type": "string", "minLength": 8 },
+                  "confirmationPassword": { "type": "string", "minLength": 8 }
+                },
+                "required": [
+                  "oldPassword",
+                  "newPassword",
+                  "confirmationPassword"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password changed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChangePasswordSuccess"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorEnvelope" }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorEnvelope" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dashboard": {
+      "get": {
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Dashboard summary",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/DashboardSuccess" }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorEnvelope" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/settings/profile": {
+      "patch": {
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "firstName": { "type": "string" },
+                  "lastName": { "type": "string" },
+                  "profilePicture": { "type": "string", "format": "binary" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Profile updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SettingsUpdateProfileSuccess"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorEnvelope" }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorEnvelope" }
+              }
+            }
+          },
+          "413": {
+            "description": "Payload too large",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorEnvelope" }
+              }
+            }
+          },
+          "415": {
+            "description": "Unsupported media type",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorEnvelope" }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorEnvelope" }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
